@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta Access-Control-Allow-Origin="*"">
     <title>swopr</title>
     <style>
         body {
@@ -18,6 +19,7 @@
             margin-top: 30px;
         }
     </style>
+    <script src="/index.js"></script>
 </head>
 <body>
 <h1>swopr demo</h1>
@@ -32,13 +34,18 @@
     <button type="button" id="post">POST</button>
     <button type="button" id="404">404</button>
     <button type="button" id="302">302</button>
+    <button type="button" id="youtube">youtube</button>
     <button type="button" id="parameter_1">Parameterized: id=1</button>
     <button type="button" id="parameter_2">Parameterized: id=2</button>
     <button type="button" id="parameter_3">Parameterized: id=3</button>
 </div>
+<iframe title="科学家突变出巨兽猪，体重6吨如大象，不慎失控破坏巨大" width="500" height="281"
+    src="https://app.zhaoyingze.com/httpass/?https://www.youtube.com/embed/3LD4W2BxUqM?feature=oembed" frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen></iframe>
+
 </body>
 
-<script src="/index.js"></script>
 <script>
 
   const responses = {
@@ -50,7 +57,8 @@
     '302': ['https://localhost/demo'],
     'parameter_1': ['https://api.example.com/users/1'],
     'parameter_2': ['https://api.example.com/users/2'],
-    'parameter_3': ['https://api.example.com/users/3']
+    'parameter_3': ['https://api.example.com/users/3'],
+    'youtube': ['https://www.youtube.com/embed/3LD4W2BxUqM?feature=oembed']
   };
 
   document.querySelectorAll('button').forEach(button => {

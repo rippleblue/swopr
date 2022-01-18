@@ -73,9 +73,9 @@ const responses = [
     }
   },
   {
-    url: 'https://localhost/*',
+    url: 'https://www.youtube.com/*',
     method: 'GET',
     status: 302,
-    redirectUrl: 'http://localhost:8080/$1'
+    redirectUrl: 'https://app.zhaoyingze.com/httpass/?https://www.youtube.com/$1'
   }
 ];
