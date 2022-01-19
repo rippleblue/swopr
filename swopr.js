@@ -44,16 +44,16 @@ const getResponseBody = (response, params) => typeof response.body === 'function
 
 const handleFetch = async (e) => {
   const {request} = e;
-  console.log(`handle request ${JSON.stringify(e)}`)
   const {method: reqMethod, url: reqUrl} = request;
   const response = getResponseFor(request);
+  console.log(`[SWOPR] handle request ${reqUrl}`);
 
   if(response) {
     const {headers, status, statusText, delay, resMethod, url: matchedUrl} = response;
     const params = matchedUrl.includes(':') ? getRequestParams(matchedUrl, reqUrl) : null;
 
     const redirectUrl = matchedUrl.includes('*') ? reqUrl.replace(new RegExp(matchedUrl.replace('*', '(.+)')), response.redirectUrl) : response.redirectUrl;
-    const init = { headers, status, statusText, url: reqUrl, method: resMethod ? resMethod : reqMethod, mode: 'no-cors'};
+    const init = { headers, status, statusText, url: reqUrl, method: resMethod ? resMethod : reqMethod, mode: 'cors'};
 
     const proxyResponse = response.file ? fetch(`${self.origin}/${response.file}`) :
       redirectUrl ? fetch(redirectUrl, init) :
