@@ -1,3 +1,6 @@
+const proxyPrefix = 'https://app.zhaoyingze.com/tinywall/tinywall.php?'
+const baseUrl = 'https://www.youtube.com/'
+
 const handleInstall = () => {
   console.log('[SW] service worker installed');
   self.skipWaiting();
@@ -7,9 +10,6 @@ const handleActivate = () => {
   console.log('[SW] service worker activated');
   return self.clients.claim();
 };
-
-const proxyPrefix = 'https://app.zhaoyingze.com/httpass/?'
-const baseUrl = 'https://www.youtube.com/'
 
 const proxyHost = (new URL(proxyPrefix)).origin
 
