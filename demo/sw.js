@@ -48,9 +48,15 @@ const handleFetch = async (e) => {
       }
     }
   }
-  e.respondWith(fetch(redirectUrl, init));
+
+  const response = await fetch(redirectUrl, init);
+  return response;
+};
+
+const handleRequest = event => {
+  event.respondWith(handleFetch(event));
 };
 
 self.addEventListener('install', handleInstall);
 self.addEventListener('activate', handleActivate);
-self.addEventListener('fetch', handleFetch);
+self.addEventListener('fetch', handleRequest);
