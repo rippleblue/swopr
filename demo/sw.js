@@ -15,7 +15,7 @@ const proxyHost = (new URL(proxyPrefix)).origin
 
 const handleFetch = async (e) => {
   const {request} = e;
-  const {method: reqMethod, url: reqUrl} = request;
+  const {method: reqMethod, url: reqUrl, headers: reqHeaders} = request;
   console.log(`[SW] handle request ${reqUrl}`);
 
   // Extract remote url from request
@@ -37,9 +37,18 @@ const handleFetch = async (e) => {
   }
 
   console.log(`[SW] proxying request ${reqMethod}: ${reqUrl} -> ${redirectUrl}`);
-  let redirectReq = request.clone();
-  redirectReq.url = redirectUrl;
-  e.respondWith(fetch(redirectReq, { mode: 'cors', method: reqMethod, credentials: 'include'}));
+  const init = { mode: 'cors', method: reqMethod, headers: reqHeaders, credentials: 'include' }
+  if (reqMethod === 'POST' && !request.bodyUsed) {
+    if (request.body) {
+      init.body = request.body
+    } else {
+      const buf = await request.arrayBuffer()
+      if (buf.byteLength > 0) {
+        init.body = buf
+      }
+    }
+  }
+  e.respondWith(fetch(redirectUrl, init));
 };
 
 self.addEventListener('install', handleInstall);
