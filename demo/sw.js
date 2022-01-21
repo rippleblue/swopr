@@ -1,39 +1,33 @@
 const proxyPrefix = 'https://app.zhaoyingze.com/tinywall/tinywall.php?'
 const baseUrl = 'https://www.youtube.com/'
 
-const handleInstall = () => {
+const handleInstall = (e) => {
   console.log('[SW] service worker installed');
-  self.skipWaiting();
+  e.waitUntil(self.skipWaiting());
 };
 
-const handleActivate = () => {
+const handleActivate = (e) => {
   console.log('[SW] service worker activated');
-  return self.clients.claim();
+  e.waitUntil(self.clients.claim());
 };
 
 const proxyHost = (new URL(proxyPrefix)).origin
 
-const handleFetch = async (e) => {
-  const {request} = e;
+const handleFetch = async (request) => {
   const {method: reqMethod, url: reqUrl, headers: reqHeaders} = request;
-  console.log(`[SW] handle request ${reqUrl}`);
 
   // Extract remote url from request
   let redirectUrl = '';
-  if (reqUrl.startsWith(proxyPrefix)) {
-    // Absolute url with proxy, we don't need to change it.
-    redirectUrl = reqUrl;
+
+  // It's may be a bad relative url
+  if (reqUrl.startsWith(proxyHost) || reqUrl.startsWith('http://localhost')) {
+    redirectUrl = proxyPrefix + baseUrl + reqUrl.substr((new URL(reqUrl)).origin.length)
+  } else if (reqUrl.startsWith('//')) {
+    redirectUrl = proxyPrefix + 'http:' + reqUrl;
+  } else if (!reqUrl.startsWith('http')) {
+    redirectUrl = proxyPrefix + baseUrl + reqUrl;
   } else {
-    // It's may be a bad relative url
-    if (reqUrl.startsWith(proxyHost) || reqUrl.startsWith('http://localhost')) {
-      redirectUrl = proxyPrefix + baseUrl + reqUrl.substr((new URL(reqUrl)).origin.length)
-    } else if (reqUrl.startsWith('//')) {
-      redirectUrl = proxyPrefix + 'http:' + reqUrl;
-    } else if (!reqUrl.startsWith('http')) {
-      redirectUrl = proxyPrefix + baseUrl + reqUrl;
-    } else {
-      redirectUrl = proxyPrefix + reqUrl;
-    }
+    redirectUrl = proxyPrefix + reqUrl;
   }
 
   console.log(`[SW] proxying request ${reqMethod}: ${reqUrl} -> ${redirectUrl}`);
@@ -49,12 +43,17 @@ const handleFetch = async (e) => {
     }
   }
 
-  const response = await fetch(redirectUrl, init);
-  return response;
+  return fetch(redirectUrl, init);
 };
 
 const handleRequest = event => {
-  event.respondWith(handleFetch(event));
+  const reqUrl = new URL(event.request.url);
+  console.log(`[SW] handle request ${reqUrl.href}`);
+  if (reqUrl.href.startsWith(proxyPrefix) || !reqUrl.protocol.startsWith('http')) {
+    console.log(`No need to proxy ${reqUrl.href}`)
+    return;
+  }
+  event.respondWith(handleFetch(event.request));
 };
 
 self.addEventListener('install', handleInstall);
