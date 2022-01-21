@@ -3,7 +3,7 @@ const baseUrl = 'https://www.youtube.com/'
 
 const handleInstall = (e) => {
   console.log('[SW] service worker installed');
-  //e.waitUntil(self.skipWaiting());
+  e.waitUntil(self.skipWaiting());
 };
 
 const handleActivate = (e) => {
@@ -33,15 +33,8 @@ const handleFetch = async (request) => {
 
   console.log(`[SW] proxying request ${reqMethod}: ${reqUrl} -> ${redirectUrl}`);
   const init = { mode: 'cors', method: reqMethod, headers: reqHeaders, credentials: 'include' }
-  if (reqMethod === 'POST' && !request.bodyUsed) {
-    if (request.body) {
-      init.body = request.body
-    } else {
-      const buf = await request.arrayBuffer()
-      if (buf.byteLength > 0) {
-        init.body = buf
-      }
-    }
+  if (reqMethod === 'POST') {
+    init.body = await request.clone().text();
   }
 
   return fetch(redirectUrl, init);
